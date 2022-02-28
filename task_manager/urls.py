@@ -30,7 +30,7 @@ from tasks.views import (
 )
 from django.contrib.auth.views import LogoutView
 
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 from rest_framework.routers import SimpleRouter
 from tasks.apiviews import TaskListAPI, TaskViewSet, TaskHistoryViewSet
 
@@ -56,4 +56,5 @@ urlpatterns = [
     path("sessiontest/", session_storage_view),
     path("taskapi/", TaskListAPI.as_view()),
     path("api/task/history/<id>/", TaskHistoryViewSet.as_view({"get": "list"})),
+    path("test_static/", TemplateView.as_view(template_name="test_static.html")),
 ] + router.urls
