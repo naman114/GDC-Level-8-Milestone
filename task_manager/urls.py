@@ -39,15 +39,6 @@ from tasks.apiviews import TaskListAPI, TaskViewSet, TaskHistoryViewSet
 router = SimpleRouter()
 router.register("api/task", TaskViewSet)
 
-from tasks.tasks import test_background_job
-
-
-def test_bg(request):
-    # .delay() will convert the function to a task that runs in the background with celery
-    test_background_job.delay()
-    return HttpResponse("All Good Here")
-
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("all_tasks/", GenericAllTaskView.as_view()),
@@ -67,5 +58,4 @@ urlpatterns = [
     path("taskapi/", TaskListAPI.as_view()),
     path("api/task/history/<id>/", TaskHistoryViewSet.as_view({"get": "list"})),
     path("test_static/", TemplateView.as_view(template_name="test_static.html")),
-    path("test_bg/", test_bg),
 ] + router.urls

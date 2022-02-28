@@ -1,6 +1,7 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from tasks.models import Task, TaskHistory
+from django.contrib.auth.models import User
+from tasks.models import Task, TaskHistory, EmailPreferences
 
 
 @receiver(pre_save, sender=Task)
@@ -15,3 +16,9 @@ def update_task_history(sender, instance, **kwargs):
                 previous_status=old_task.status,
                 current_status=new_task.status,
             )
+
+
+@receiver(post_save, sender=User)
+def create_email_preference(sender, instance, created, **kwargs):
+    if created:
+        EmailPreferences.objects.create(user=instance)

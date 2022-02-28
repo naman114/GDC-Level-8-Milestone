@@ -38,3 +38,12 @@ class TaskHistory(models.Model):
 
     def __str__(self):
         return str(self.task)
+
+
+class EmailPreferences(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    selected_email_hour = models.IntegerField(default=0)
+    previous_report_day = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.user)

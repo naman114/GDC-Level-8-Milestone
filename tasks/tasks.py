@@ -1,35 +1,49 @@
-import time
-
-from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from tasks.models import Task
-from datetime import timedelta
+from tasks.models import EmailPreferences, Task, STATUS_CHOICES
+from datetime import datetime
 
-from celery.task import periodic_task
+from celery.schedules import crontab
 
 from task_manager.celery import app
 
-# Scheduled / periodic tasks
-@periodic_task(run_every=timedelta(seconds=10))
-def send_email_reminder():
-    print("Starting to process users to send emails")
-    for user in User.objects.all():
-        pending_tasks = Task.objects.filter(user=user, completed=False, deleted=False)
-        email_content = f"You have {pending_tasks.count()} pending tasks"
-        send_mail(
-            "Pending tasks from Task Manager",
-            email_content,
-            "tasks@task_manager.org",
-            [user.email],
-        )
-        print(f"Completed Process User {user.id}")
+
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    # Setup an hourly job to check all users' email preferences and send out reports for those due
+    sender.add_periodic_task(crontab(), check_email_preferences.s())
 
 
-# Define tasks like this to start tasks dynamically
-# This registers this method with celery and lets celery know that this task can be executed async in background
 @app.task
-def test_background_job():
-    print("This is a background job!")
-    for i in range(10):
-        time.sleep(1)
-        print(i)
+def check_email_preferences():
+    current_date = datetime.now().day
+    current_hour = datetime.now().hour
+
+    reports_to_send = EmailPreferences.objects.filter(
+        selected_email_hour__lte=current_hour
+    ).exclude(previous_report_day=current_date)
+
+    for email_preference in reports_to_send:
+        send_email_reminder(email_preference.user)
+        email_preference.previous_report_day = current_date
+        email_preference.save()
+
+
+def send_email_reminder(user):
+    print(f"Starting to send email to user {user}")
+
+    email_content = "Task Manager Report\n"
+
+    for status_choice in STATUS_CHOICES:
+        pending_tasks_count = Task.objects.filter(
+            user=user, deleted=False, status=status_choice[0]
+        ).count()
+        email_content += f"{status_choice[0]} tasks: {pending_tasks_count}\n"
+
+    send_mail(
+        "Daily Report from Task Manager",
+        email_content,
+        "tasks@task_manager.org",
+        [user.email],
+    )
+
+    print(f"Email sent to user {user}")
