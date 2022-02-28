@@ -146,7 +146,7 @@ class TaskCreateForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ("title", "description", "priority", "completed")
+        fields = ("title", "description", "priority", "status", "completed")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -159,6 +159,9 @@ class TaskCreateForm(ModelForm):
         self.fields["description"].widget.attrs["cols"] = "30"
         self.fields["description"].widget.attrs["rows"] = "5"
         self.fields["priority"].widget.attrs[
+            "class"
+        ] = "mb-7 block w-full px-3 py-2 bg-gray-100 text-gray-900 rounded-lg"
+        self.fields["status"].widget.attrs[
             "class"
         ] = "mb-7 block w-full px-3 py-2 bg-gray-100 text-gray-900 rounded-lg"
         self.fields["completed"].widget.attrs["class"] = "ml-2"
@@ -294,6 +297,7 @@ class EmailPreferencesForm(ModelForm):
         if hour < 0 or hour > 23:
             raise ValidationError("Error: hour must be from 0 to 23")
         return hour
+
     class Meta:
         model = EmailPreferences
         fields = ["selected_email_hour"]

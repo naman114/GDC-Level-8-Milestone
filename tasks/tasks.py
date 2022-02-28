@@ -34,10 +34,10 @@ def send_email_reminder(user):
     email_content = "Task Manager Report\n"
 
     for status_choice in STATUS_CHOICES:
-        pending_tasks_count = Task.objects.filter(
+        tasks_count = Task.objects.filter(
             user=user, deleted=False, status=status_choice[0]
         ).count()
-        email_content += f"{status_choice[0]} tasks: {pending_tasks_count}\n"
+        email_content += f"{status_choice[0]} tasks: {tasks_count}\n"
 
     send_mail(
         "Daily Report from Task Manager",
