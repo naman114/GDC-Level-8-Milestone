@@ -298,6 +298,13 @@ class EmailPreferencesForm(ModelForm):
         model = EmailPreferences
         fields = ["selected_email_hour"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["selected_email_hour"].widget.attrs[
+            "class"
+        ] = "mb-7 block w-full px-3 py-2 bg-gray-100 text-gray-900 rounded-lg"
+        self.error_css_class = "text-sm"
+
 
 class GenericEmailPreferencesUpdateView(LoginRequiredMixin, UpdateView):
     model = EmailPreferences

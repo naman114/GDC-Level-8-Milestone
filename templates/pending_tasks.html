@@ -8,9 +8,19 @@
 <div class="max-w-md w-full space-y-6">
   <div class="flex justify-between">
     <h2 class="mt-6 text-4xl font-bold text-gray-900">Hi {{ request.user }}</h2>
-    <h2 class="mt-6 mr-2 text-xl text-red-500 hover:cursor-pointer">
-      <a href="/user/logout">Log out</a>
-    </h2>
+    <div class="flex flex-col justify-end">
+      <h2 class="mt-6 mr-2 text-xl text-red-500 hover:cursor-pointer">
+        <a href="/user/logout">Log out</a>
+      </h2>
+      <a href="/update-email-pref/{{ user.id }}" class="flex justify-end">
+        <div class="w-10 h-10 mx-2 flex justify-end items-end rounded-md">
+          <span
+            class="iconify w-6 h-6"
+            data-icon="eva:settings-2-outline"
+          ></span>
+        </div>
+      </a>
+    </div>
   </div>
 
   <h3>
