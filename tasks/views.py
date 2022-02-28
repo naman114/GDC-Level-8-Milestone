@@ -1,7 +1,7 @@
 from itertools import chain
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.safestring import mark_safe
-from tasks.models import Task
+from tasks.models import EmailPreferences, Task
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -283,3 +283,27 @@ class UserLoginForm(AuthenticationForm):
 class UserLoginView(LoginView):
     template_name = "user_login.html"
     authentication_form = UserLoginForm
+
+
+################################ Update Email Preferences ##########################################
+
+
+class EmailPreferencesForm(ModelForm):
+    def clean_selected_email_hour(self):
+        hour = self.cleaned_data["selected_email_hour"]
+        if hour < 0 or hour > 23:
+            raise ValidationError("Error: hour must be from 0 to 23")
+        return hour
+    class Meta:
+        model = EmailPreferences
+        fields = ["selected_email_hour"]
+
+
+class GenericEmailPreferencesUpdateView(LoginRequiredMixin, UpdateView):
+    model = EmailPreferences
+    form_class = EmailPreferencesForm
+    template_name = "email_preferences.html"
+    success_url = "/tasks"
+
+    def get_queryset(self):
+        return EmailPreferences.objects.filter(user=self.request.user)

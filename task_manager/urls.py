@@ -28,6 +28,7 @@ from tasks.views import (
     GenericCompletedTaskView,
     GenericMarkTaskAsCompleteView,
     GenericAllTaskView,
+    GenericEmailPreferencesUpdateView,
 )
 from django.contrib.auth.views import LogoutView
 
@@ -58,4 +59,5 @@ urlpatterns = [
     path("taskapi/", TaskListAPI.as_view()),
     path("api/task/history/<id>/", TaskHistoryViewSet.as_view({"get": "list"})),
     path("test_static/", TemplateView.as_view(template_name="test_static.html")),
+    path("update-email-pref/<pk>", GenericEmailPreferencesUpdateView.as_view()),
 ] + router.urls

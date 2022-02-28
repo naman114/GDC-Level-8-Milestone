@@ -10,7 +10,7 @@ from task_manager.celery import app
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Setup an hourly job to check all users' email preferences and send out reports for those due
-    sender.add_periodic_task(crontab(), check_email_preferences.s())
+    sender.add_periodic_task(crontab(hour="*", minute=0), check_email_preferences.s())
 
 
 @app.task
